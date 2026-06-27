@@ -81,19 +81,19 @@ export default function Projects() {
     <div className="max-w-5xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-ink">Projects</h1>
+          <h1 className="text-xl lg:text-2xl font-bold text-ink">Projects</h1>
           <p className="text-ink-muted text-sm mt-1">{projects.length} total</p>
         </div>
-        <button className="btn-primary" onClick={openAdd}>+ New Project</button>
+        <button className="btn-primary text-sm" onClick={openAdd}>+ New</button>
       </div>
 
-      {/* Filter tabs */}
-      <div className="flex gap-2">
+      {/* Filter tabs - scrollable on mobile */}
+      <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
         {['all', 'active', 'paused', 'completed'].map((s) => (
           <button
             key={s}
             onClick={() => setFilter(s)}
-            className={`px-3 py-1.5 rounded-lg text-sm capitalize transition-all ${
+            className={`px-3 py-1.5 rounded-lg text-sm capitalize transition-all whitespace-nowrap ${
               filter === s ? 'bg-primary text-white' : 'text-ink-muted hover:text-ink bg-surface-card border border-surface-border'
             }`}
           >
@@ -115,32 +115,29 @@ export default function Projects() {
         <div className="grid gap-4">
           {filtered.map((p) => {
             const pct = p.totalAmount > 0 ? Math.round((p.paidAmount / p.totalAmount) * 100) : 0;
-            const daysLeft = p.deadline
-              ? Math.ceil((new Date(p.deadline) - new Date()) / 86400000)
-              : null;
+            const daysLeft = p.deadline ? Math.ceil((new Date(p.deadline) - new Date()) / 86400000) : null;
             return (
               <div key={p._id} className="card space-y-3">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <h3 className="font-semibold text-ink">{p.title}</h3>
+                      <h3 className="font-semibold text-ink text-sm lg:text-base">{p.title}</h3>
                       <span className={`badge ${STATUS_COLORS[p.status]}`}>{p.status}</span>
                     </div>
-                    <p className="text-xs text-ink-muted mt-0.5">
+                    <p className="text-xs text-ink-muted mt-0.5 truncate">
                       {p.clientId?.name}{p.clientId?.company ? ` · ${p.clientId.company}` : ''}
                     </p>
-                    {p.description && <p className="text-sm text-ink-faint mt-1">{p.description}</p>}
+                    {p.description && <p className="text-xs text-ink-faint mt-1 line-clamp-2">{p.description}</p>}
                   </div>
-                  <div className="flex gap-2 shrink-0">
-                    <button className="btn-ghost text-xs" onClick={() => openEdit(p)}>Edit</button>
-                    <button className="btn-danger text-xs" onClick={() => handleDelete(p._id)}>Delete</button>
+                  <div className="flex gap-1.5 shrink-0">
+                    <button className="btn-ghost text-xs px-2 py-1" onClick={() => openEdit(p)}>Edit</button>
+                    <button className="btn-danger text-xs px-2 py-1" onClick={() => handleDelete(p._id)}>Del</button>
                   </div>
                 </div>
 
-                {/* Payment bar */}
                 <div>
                   <div className="flex justify-between text-xs text-ink-muted mb-1">
-                    <span>Payment — PKR {(p.paidAmount || 0).toLocaleString()} / {(p.totalAmount || 0).toLocaleString()}</span>
+                    <span>PKR {(p.paidAmount || 0).toLocaleString()} / {(p.totalAmount || 0).toLocaleString()}</span>
                     <span>{pct}%</span>
                   </div>
                   <div className="h-1.5 bg-surface-border rounded-full overflow-hidden">
@@ -150,7 +147,7 @@ export default function Projects() {
 
                 {daysLeft !== null && (
                   <p className={`text-xs ${daysLeft < 0 ? 'text-danger' : daysLeft <= 3 ? 'text-warning' : 'text-ink-faint'}`}>
-                    {daysLeft < 0 ? `${Math.abs(daysLeft)} days overdue` : daysLeft === 0 ? 'Due today' : `${daysLeft} days left`}
+                    {daysLeft < 0 ? `${Math.abs(daysLeft)}d overdue` : daysLeft === 0 ? 'Due today' : `${daysLeft} days left`}
                   </p>
                 )}
               </div>
