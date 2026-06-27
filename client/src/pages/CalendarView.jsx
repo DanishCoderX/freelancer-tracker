@@ -7,9 +7,7 @@ export default function CalendarView() {
   const [projects, setProjects] = useState([]);
   const [selected, setSelected] = useState(new Date());
 
-  useEffect(() => {
-    api.get('/projects').then((r) => setProjects(r.data));
-  }, []);
+  useEffect(() => { api.get('/projects').then((r) => setProjects(r.data)); }, []);
 
   const deadlineMap = projects.reduce((map, p) => {
     if (!p.deadline) return map;
@@ -37,38 +35,32 @@ export default function CalendarView() {
     const items = deadlineMap[date.toDateString()];
     if (!items) return '';
     const hasOverdue = items.some((p) => p.status !== 'completed' && new Date(p.deadline) < new Date());
-    if (hasOverdue) return 'has-overdue';
-    return 'has-deadline';
+    return hasOverdue ? 'has-overdue' : 'has-deadline';
   };
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-ink">Calendar</h1>
+        <h1 className="text-xl lg:text-2xl font-bold text-ink">Calendar</h1>
         <p className="text-ink-muted text-sm mt-1">Project deadlines at a glance</p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="card">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
+        <div className="card overflow-hidden">
           <style>{`
             .react-calendar { width: 100%; background: transparent; border: none; font-family: inherit; }
-            .react-calendar__tile { color: #f1f5f9; background: transparent; border-radius: 8px; padding: 8px 4px; }
+            .react-calendar__tile { color: #f1f5f9; background: transparent; border-radius: 8px; padding: 6px 4px; font-size: 13px; }
             .react-calendar__tile:hover { background: #334155; }
             .react-calendar__tile--now { background: rgba(99,102,241,0.15) !important; color: #a5b4fc !important; }
             .react-calendar__tile--active { background: #6366f1 !important; color: white !important; }
-            .react-calendar__navigation button { color: #94a3b8; background: transparent; font-size: 14px; }
+            .react-calendar__navigation button { color: #94a3b8; background: transparent; font-size: 13px; }
             .react-calendar__navigation button:hover { background: #334155; border-radius: 8px; }
-            .react-calendar__month-view__weekdays { color: #475569; font-size: 11px; text-transform: uppercase; }
+            .react-calendar__month-view__weekdays { color: #475569; font-size: 10px; text-transform: uppercase; }
             .react-calendar__month-view__weekdays abbr { text-decoration: none; }
             .has-deadline { border: 1px solid rgba(99,102,241,0.4); }
             .has-overdue { border: 1px solid rgba(239,68,68,0.4); }
           `}</style>
-          <Calendar
-            onChange={setSelected}
-            value={selected}
-            tileContent={tileContent}
-            tileClassName={tileClassName}
-          />
+          <Calendar onChange={setSelected} value={selected} tileContent={tileContent} tileClassName={tileClassName} />
         </div>
 
         <div className="card">
@@ -84,25 +76,18 @@ export default function CalendarView() {
                 return (
                   <li key={p._id} className="p-3 bg-surface rounded-lg border border-surface-border">
                     <div className="flex items-center justify-between gap-2">
-                      <span className="font-medium text-sm text-ink">{p.title}</span>
-                      <span className={`badge ${
-                        p.status === 'completed' ? 'bg-primary/10 text-primary' :
-                        isOverdue ? 'bg-danger/10 text-danger' :
-                        'bg-success/10 text-success'
-                      }`}>
+                      <span className="font-medium text-sm text-ink truncate">{p.title}</span>
+                      <span className={`badge shrink-0 ${p.status === 'completed' ? 'bg-primary/10 text-primary' : isOverdue ? 'bg-danger/10 text-danger' : 'bg-success/10 text-success'}`}>
                         {isOverdue ? 'overdue' : p.status}
                       </span>
                     </div>
-                    {p.clientId?.name && (
-                      <p className="text-xs text-ink-muted mt-1">{p.clientId.name}</p>
-                    )}
+                    {p.clientId?.name && <p className="text-xs text-ink-muted mt-1">{p.clientId.name}</p>}
                   </li>
                 );
               })}
             </ul>
           )}
 
-          {/* Upcoming list */}
           <div className="mt-6">
             <h3 className="text-xs font-semibold text-ink-muted uppercase tracking-wide mb-3">All Upcoming</h3>
             <ul className="space-y-2">
@@ -111,8 +96,7 @@ export default function CalendarView() {
                 .sort((a, b) => new Date(a.deadline) - new Date(b.deadline))
                 .slice(0, 6)
                 .map((p) => {
-                  const d = new Date(p.deadline);
-                  const daysLeft = Math.ceil((d - new Date()) / 86400000);
+                  const daysLeft = Math.ceil((new Date(p.deadline) - new Date()) / 86400000);
                   return (
                     <li key={p._id} className="flex items-center justify-between text-sm">
                       <span className="text-ink truncate max-w-[160px]">{p.title}</span>
