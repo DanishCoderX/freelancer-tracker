@@ -8,13 +8,11 @@ const EMPTY = { name: '', email: '', phone: '', company: '' };
 export default function Clients() {
   const [clients, setClients] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [modal, setModal] = useState(null); // null | 'add' | { ...client }
+  const [modal, setModal] = useState(null);
   const [form, setForm] = useState(EMPTY);
   const [saving, setSaving] = useState(false);
 
-  const fetchClients = () =>
-    api.get('/clients').then((r) => setClients(r.data)).finally(() => setLoading(false));
-
+  const fetchClients = () => api.get('/clients').then((r) => setClients(r.data)).finally(() => setLoading(false));
   useEffect(() => { fetchClients(); }, []);
 
   const openAdd = () => { setForm(EMPTY); setModal('add'); };
@@ -48,19 +46,17 @@ export default function Clients() {
       await api.delete(`/clients/${id}`);
       setClients(clients.filter((c) => c._id !== id));
       toast.success('Client deleted');
-    } catch {
-      toast.error('Error deleting client');
-    }
+    } catch { toast.error('Error deleting client'); }
   };
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-ink">Clients</h1>
+          <h1 className="text-xl lg:text-2xl font-bold text-ink">Clients</h1>
           <p className="text-ink-muted text-sm mt-1">{clients.length} client{clients.length !== 1 ? 's' : ''}</p>
         </div>
-        <button className="btn-primary" onClick={openAdd}>+ Add Client</button>
+        <button className="btn-primary text-sm" onClick={openAdd}>+ Add Client</button>
       </div>
 
       {loading ? (
@@ -75,21 +71,19 @@ export default function Clients() {
       ) : (
         <div className="grid gap-3">
           {clients.map((c) => (
-            <div key={c._id} className="card flex items-center justify-between gap-4">
-              <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm shrink-0">
+            <div key={c._id} className="card flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm shrink-0">
                   {c.name.charAt(0).toUpperCase()}
                 </div>
-                <div>
-                  <p className="font-medium text-ink">{c.name}</p>
-                  <p className="text-xs text-ink-muted">
-                    {[c.company, c.email].filter(Boolean).join(' · ')}
-                  </p>
+                <div className="min-w-0">
+                  <p className="font-medium text-ink text-sm truncate">{c.name}</p>
+                  <p className="text-xs text-ink-muted truncate">{[c.company, c.email].filter(Boolean).join(' · ')}</p>
                 </div>
               </div>
               <div className="flex gap-2 shrink-0">
-                <button className="btn-ghost text-xs" onClick={() => openEdit(c)}>Edit</button>
-                <button className="btn-danger text-xs" onClick={() => handleDelete(c._id)}>Delete</button>
+                <button className="btn-ghost text-xs px-2 py-1" onClick={() => openEdit(c)}>Edit</button>
+                <button className="btn-danger text-xs px-2 py-1" onClick={() => handleDelete(c._id)}>Del</button>
               </div>
             </div>
           ))}
